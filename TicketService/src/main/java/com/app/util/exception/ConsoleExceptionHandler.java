@@ -15,6 +15,9 @@ public class ConsoleExceptionHandler implements ExceptionHandler{
 		// TODO Auto-generated method stub
 		StringBuilder builder = new StringBuilder(ObjectUtil.getStackStraceAsString(e));
 		builder.append(" with Message -> "+message);
+		/**
+		 * TODO: change to Logger implementation.
+		 */
 		System.out.println(builder.toString());
 	}
 

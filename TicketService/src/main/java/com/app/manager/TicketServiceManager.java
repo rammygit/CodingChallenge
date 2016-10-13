@@ -28,7 +28,13 @@ public class TicketServiceManager implements IServiceManager{
 	@Override
 	public int getSeatCount(SeatStatus status) {
 		
-		int count = inMemoryDataHolder.getAvailableSeatCount();
+		int count = 0;
+		
+		try {
+			count = inMemoryDataHolder.getAvailableSeatCount();
+		} catch (DBException e) {
+			exceptionHandler.handle(e, e.getMessage());
+		}
 		//inMemoryDataHolder.printData();
 		return count;
 	}
@@ -40,14 +46,13 @@ public class TicketServiceManager implements IServiceManager{
 		try {
 			seatHold = inMemoryDataHolder.holdSeat(seatCount, email);
 		} catch (DBException e) {
-			
-			System.err.println(ObjectUtil.getStackStraceAsString(e));
+			exceptionHandler.handle(e, e.getMessage());
 		} catch (Exception ex){
 			/**
 			 * need to log this for error parsing.
 			 */
-			System.err.println(ObjectUtil.getStackStraceAsString(ex));
 			seatHold = AppObjectFactory.createAtomicSeatHold(email, null, true);
+			exceptionHandler.handle(ex, ex.getMessage());
 		}
 		//inMemoryDataHolder.printData();
 		return seatHold;
@@ -61,6 +66,7 @@ public class TicketServiceManager implements IServiceManager{
 		}catch(Exception e){
 			/**/
 			code = ApplicationConfig.errorCode;
+			exceptionHandler.handle(e, e.getMessage());
 		}
 		
 		//inMemoryDataHolder.printData();

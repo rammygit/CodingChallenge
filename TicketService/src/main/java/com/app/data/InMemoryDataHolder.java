@@ -77,7 +77,7 @@ public class InMemoryDataHolder {
 	 * return the current available seat count
 	 * @return
 	 */
-	public int getAvailableSeatCount(){
+	public int getAvailableSeatCount() throws DBException {
 		/**
 		 * to release the seats on getting the latest.
 		 * 
@@ -130,11 +130,9 @@ public class InMemoryDataHolder {
 
 			}
 		}catch(Exception ex){
-			System.err.println(ObjectUtil.getStackStraceAsString(ex));
 			
 			seatHold = addToSeatHoldMap(email, seatList, false);
-			
-			throw new DBException("Cannot process the transaction.");
+			throw new DBException("Cannot process the transaction ->"+ObjectUtil.getStackStraceAsString(ex));
 		}
 		
 		return seatHold;
@@ -169,12 +167,11 @@ public class InMemoryDataHolder {
 			}
 			
 			seatHoldMap.remove(seatHoldId);
-			
+			/* ----- confirmation key ---- */
 			return UUID.randomUUID().toString();
+			
 		}catch(Exception ex){
-			//log the error.
-			System.out.println(ObjectUtil.getStackStraceAsString(ex));
-			throw new DBException(ex.getMessage());
+			throw new DBException(ex.getMessage()+" -> "+ObjectUtil.getStackStraceAsString(ex));
 		}finally{
 			readWriteLock.writeLock().unlock();
 		}
@@ -188,7 +185,7 @@ public class InMemoryDataHolder {
 	 * @param isError
 	 * @return
 	 */
-	private SeatHold addToSeatHoldMap(String email,List<AtomicSeatReference> seatList,boolean isError){
+	private SeatHold addToSeatHoldMap(String email,List<AtomicSeatReference> seatList,boolean isError) throws DBException{
 		SeatHold seatHold = AppObjectFactory.createAtomicSeatHold(email, seatList,isError);
 		/* concurrent hashmap will lock only the write operation/ entry */
 		/**
@@ -203,22 +200,18 @@ public class InMemoryDataHolder {
 	 * to release the seat from hold status after the hold expires.
 	 * time configured in the application config.
 	 */
-	private void releaseSeats(){
-		
-		try{
-			//seatWriteLock.lock();
-			for(AtomicSeatReference atomicSeatReference:seats
-					.parallelStream()
-					.filter(p->p.get().getHoldStartTime() >= ApplicationConfig.holdIntervalTime)
-					.collect(Collectors.toList())){
-				
-				atomicSeatReference.get().setStatus(SeatStatus.AVAILABLE);
-				atomicSeatReference.get().setHoldStartTime(0L);
-			}
-			
-		}finally {
-			//seatWriteLock.unlock();
+	private void releaseSeats() throws DBException{
+
+		//seatWriteLock.lock();
+		for(AtomicSeatReference atomicSeatReference:seats
+				.parallelStream()
+				.filter(p->p.get().getHoldStartTime() >= ApplicationConfig.holdIntervalTime)
+				.collect(Collectors.toList())){
+
+			atomicSeatReference.get().setStatus(SeatStatus.AVAILABLE);
+			atomicSeatReference.get().setHoldStartTime(0L);
 		}
+
 	}
 	
 	
