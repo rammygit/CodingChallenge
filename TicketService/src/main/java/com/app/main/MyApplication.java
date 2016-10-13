@@ -12,16 +12,18 @@ import com.app.service.TicketService;
  * @author ramkumarsundarajan
  *
  */
-public class Application {
+public class MyApplication {
 
 	
 	public static void main(String[] args) {
 
-		ApplicationConfig.setTotalSeats(100);
+		ApplicationConfig.setTotalSeats(10);
 		
 		ITicketService service = new TicketService(new TicketServiceManager());
 		
 		int totalAvailableSeats = service.numSeatsAvailable();
+		
+		
 		
 		System.out.println("total available seats -> "+totalAvailableSeats);
 		

@@ -98,7 +98,7 @@ public class DataHolder {
 			for(Seat seat : atomicSeats.getReference()
 					.parallelStream().
 					filter(p->p.getStatus().equals(SeatStatus.AVAILABLE))
-					.sorted()
+					.sorted((f1, f2) -> Integer.signum(f1.getId() - f2.getId()))
 					.limit(seatCount)
 					.collect(Collectors.toList())){
 				seat.setHoldStartTime(timeInMS);
@@ -168,6 +168,12 @@ public class DataHolder {
 	private DataHolder(){
 		for(int i=0;i<ApplicationConfig.getTotalSeats();i++)
 			atomicSeats.getReference().add(new Seat(i, SeatStatus.AVAILABLE));
+	}
+	
+	
+	public  void printData(){
+		for(Seat seat:atomicSeats.getReference())
+			System.out.println("seat -> "+seat.getId() +" status -> "+seat.getStatus().toString());
 	}
 	
 	

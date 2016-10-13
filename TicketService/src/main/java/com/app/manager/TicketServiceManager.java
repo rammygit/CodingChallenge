@@ -16,19 +16,27 @@ public class TicketServiceManager implements IServiceManager{
 	
 	@Override
 	public int getSeatCount(SeatStatus status) {
-		return dataHolder.getAvailableSeatCount();
+		
+		int count =  dataHolder.getAvailableSeatCount();
+		dataHolder.printData();
+		return count;
 	}
 
 	@Override
 	public SeatHold holdSeats(int seatCount, String email) {
 		
-		return dataHolder.holdSeat(seatCount, email);
+		SeatHold seatHold =  dataHolder.holdSeat(seatCount, email);
+		dataHolder.printData();
+		return seatHold;
 	}
 
 	@Override
 	public String reserve(int holdId,String email) {
 		
-		return dataHolder.reserveSeats(holdId, email);
+		String code =  dataHolder.reserveSeats(holdId, email);
+		
+		dataHolder.printData();
+		return code;
 	}
 
 }
