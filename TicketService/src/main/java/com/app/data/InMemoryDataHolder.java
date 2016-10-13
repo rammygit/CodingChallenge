@@ -125,11 +125,11 @@ public class InMemoryDataHolder {
 		
 		SeatHold seatHold = seatHoldMap.get(seatHoldId);
 		
-		if(ObjectUtil.isNotNull(seatHold) && ObjectUtil.validCollection(seatHold.getSeats())){
-			for(Seat seat:seatHold.getSeats()){
+		if(ObjectUtil.isNotNull(seatHold) && ObjectUtil.validCollection(seatHold.getAtomicSeats())){
+			for(AtomicSeatReference atomicSeatReference:seatHold.getAtomicSeats()){
 				//resetting the hold start time back.
-				seat.setHoldStartTime(0L);
-				seat.setStatus(SeatStatus.RESERVED);
+				atomicSeatReference.get().setHoldStartTime(0L);
+				atomicSeatReference.get().setStatus(SeatStatus.RESERVED);
 			}
 		}
 		

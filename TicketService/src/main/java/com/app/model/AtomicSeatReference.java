@@ -41,7 +41,4 @@ public final class AtomicSeatReference extends AtomicReference<Seat> implements 
 		return Math.subtractExact(this.get().getId(), o.get().getId());
 	}
 	
-	
-	
-
 }

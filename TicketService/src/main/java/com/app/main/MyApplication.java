@@ -23,8 +23,6 @@ public class MyApplication {
 		
 		int totalAvailableSeats = service.numSeatsAvailable();
 		
-		
-		
 		System.out.println("total available seats -> "+totalAvailableSeats);
 		
 		/**
