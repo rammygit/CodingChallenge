@@ -7,6 +7,7 @@ import com.app.model.AtomicSeatReference;
 import com.app.model.Customer;
 import com.app.model.Seat;
 import com.app.model.SeatHold;
+import com.app.model.Transaction;
 
 /**
  * 
@@ -19,6 +20,8 @@ public class AppObjectFactory {
 	
 	private static final AtomicInteger seatHoldIdCounter = new AtomicInteger(0);
 	
+	private static final AtomicInteger transactionCounter = new AtomicInteger(0);
+	
 	
 	/**
 	 * create SeatHold with given email and list of seats
@@ -26,11 +29,12 @@ public class AppObjectFactory {
 	 * @param seatList
 	 * @return
 	 */
+	@Deprecated
 	public static SeatHold createSeatHold(String email,List<Seat> seatList){
 		SeatHold seatHold = new SeatHold();
 		seatHold.setId(seatHoldIdCounter.incrementAndGet());
 		seatHold.setCustomer(createCustomer(email));
-		seatHold.setSeats(seatList);
+		//seatHold.setSeats(seatList);
 		return seatHold;
 		
 	}
@@ -41,11 +45,12 @@ public class AppObjectFactory {
 	 * @param seatList
 	 * @return
 	 */
-	public static SeatHold createAtomicSeatHold(String email,List<AtomicSeatReference> seatList){
+	public static SeatHold createAtomicSeatHold(String email,List<AtomicSeatReference> seatList,boolean isError){
 		SeatHold seatHold = new SeatHold();
 		seatHold.setId(seatHoldIdCounter.incrementAndGet());
 		seatHold.setCustomer(createCustomer(email));
 		seatHold.setAtomicSeats(seatList);
+		seatHold.setTransaction(createTransaction(isError));
 		return seatHold;
 		
 	}
@@ -61,6 +66,19 @@ public class AppObjectFactory {
 		customer.setId(customerIdCounter.incrementAndGet());
 		customer.setEmail(email);
 		return customer;
+	}
+	
+	/**
+	 * 
+	 * @return
+	 */
+	private static Transaction createTransaction(boolean isError){
+		
+		Transaction transaction = new Transaction();
+		transaction.setCode(isError?"01":"00");
+		transaction.setDescription(isError?"Transaction Failed.":"Transaction Successful");
+		transaction.setError(isError);
+		return transaction;
 	}
 	
 	/**

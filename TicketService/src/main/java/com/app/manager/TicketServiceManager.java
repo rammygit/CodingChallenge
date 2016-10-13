@@ -1,9 +1,13 @@
 package com.app.manager;
 
-import com.app.data.DataHolder;
+import com.app.data.ApplicationConfig;
 import com.app.data.InMemoryDataHolder;
+import com.app.factory.AppObjectFactory;
 import com.app.model.Seat.SeatStatus;
 import com.app.model.SeatHold;
+import com.app.util.ObjectUtil;
+import com.app.util.exception.DBException;
+import com.app.util.exception.ExceptionHandler;
 
 /**
  * TODO: need to throw validationException on email validity fail.
@@ -12,32 +16,54 @@ import com.app.model.SeatHold;
  */
 public class TicketServiceManager implements IServiceManager{
 	
-	private final DataHolder dataHolder = DataHolder.getInstance();
-	
 	private final InMemoryDataHolder inMemoryDataHolder = InMemoryDataHolder.getInstance();
+	
+	private ExceptionHandler exceptionHandler;
+	
+	public TicketServiceManager(ExceptionHandler exceptionHandler) {
+		this.exceptionHandler = exceptionHandler;
+	}
 	
 	
 	@Override
 	public int getSeatCount(SeatStatus status) {
 		
 		int count = inMemoryDataHolder.getAvailableSeatCount();
-		inMemoryDataHolder.printData();
+		//inMemoryDataHolder.printData();
 		return count;
 	}
 
 	@Override
 	public SeatHold holdSeats(int seatCount, String email) {
 		
-		SeatHold seatHold =  inMemoryDataHolder.holdSeat(seatCount, email);
-		inMemoryDataHolder.printData();
+		SeatHold seatHold = null;
+		try {
+			seatHold = inMemoryDataHolder.holdSeat(seatCount, email);
+		} catch (DBException e) {
+			
+			System.err.println(ObjectUtil.getStackStraceAsString(e));
+		} catch (Exception ex){
+			/**
+			 * need to log this for error parsing.
+			 */
+			System.err.println(ObjectUtil.getStackStraceAsString(ex));
+			seatHold = AppObjectFactory.createAtomicSeatHold(email, null, true);
+		}
+		//inMemoryDataHolder.printData();
 		return seatHold;
 	}
 
 	@Override
 	public String reserve(int holdId,String email) {
+		String code = null;
+		try{
+			code =  inMemoryDataHolder.reserveSeats(holdId, email);
+		}catch(Exception e){
+			/**/
+			code = ApplicationConfig.errorCode;
+		}
 		
-		String code =  inMemoryDataHolder.reserveSeats(holdId, email);
-		inMemoryDataHolder.printData();
+		//inMemoryDataHolder.printData();
 		return code;
 	}
 

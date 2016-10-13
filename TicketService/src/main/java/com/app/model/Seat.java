@@ -1,24 +1,52 @@
 package com.app.model;
 
+import java.io.Serializable;
 import java.util.Comparator;
 
-public class Seat implements Comparable<Seat>{
+/**
+ * 
+ * @author ramkumarsundarajan
+ *
+ */
+public class Seat implements Comparable<Seat>,Serializable{
+	
+	private static final long serialVersionUID = 1L;
 	
 	public enum SeatStatus {
 		AVAILABLE,HOLD,RESERVED;
 	}
 	
+	/**
+	 * unique id referring seat
+	 */
 	private Integer id;
 	
-	private SeatStatus status;
+	/**
+	 * user friendly representation
+	 * 
+	 */
+	private String name;
 	
-	private long holdStartTime;
+	/**
+	 * internal to app.
+	 */
+	private transient SeatStatus status;
+	
+	/**
+	 * internal to app.
+	 */
+	private transient long holdStartTime;
 	
 	public Seat(Integer id,SeatStatus status){
 		
 		this.id = id;
 		this.status = status;
+		this.name = "S"+id;
 		
+	}
+	
+	public String getName(){
+		return name;
 	}
 
 	public Integer getId() {

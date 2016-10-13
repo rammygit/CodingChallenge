@@ -13,16 +13,17 @@ public class SeatHold implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
-	
 	private int id;
 	
 	private long timeStamp;
 	
 	private Customer customer;
 	
-	private List<Seat> seats;
+	//private List<Seat> seats;
 	
 	private List<AtomicSeatReference> atomicSeats;
+	
+	private Transaction transaction;
 
 	
 	
@@ -58,16 +59,13 @@ public class SeatHold implements Serializable{
 		this.customer = customer;
 	}
 
-	public List<Seat> getSeats() {
-		return seats;
+	public Transaction getTransaction() {
+		return transaction;
 	}
 
-	public void setSeats(List<Seat> seats) {
-		this.seats = seats;
+	public void setTransaction(Transaction transaction) {
+		this.transaction = transaction;
 	}
-	
-	
-	
-	
+
 
 }

@@ -5,6 +5,7 @@ import com.app.manager.TicketServiceManager;
 import com.app.model.SeatHold;
 import com.app.service.ITicketService;
 import com.app.service.TicketService;
+import com.app.util.exception.ConsoleExceptionHandler;
 
 /**
  * main application 
@@ -15,11 +16,18 @@ import com.app.service.TicketService;
 public class MyApplication {
 
 	
+	/**
+	 * 
+	 * @param args
+	 * @throws Exception
+	 */
 	public static void main(String[] args) throws Exception {
 
 		ApplicationConfig.setTotalSeats(10);
 		
-		ITicketService service = new TicketService(new TicketServiceManager());
+		ITicketService service = new TicketService(
+				new TicketServiceManager(
+						new ConsoleExceptionHandler()));
 		
 		int totalAvailableSeats = service.numSeatsAvailable();
 		

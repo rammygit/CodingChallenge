@@ -13,6 +13,9 @@ public class ApplicationConfig {
 	
 	public static final long holdIntervalTime = 10L;
 	
+	public static final String errorCode = "00000";
+	
+	
 	
 	public static int getTotalSeats(){
 		return totalSeats;
@@ -21,6 +24,8 @@ public class ApplicationConfig {
 	public static void setTotalSeats(int totalSeats){
 		ApplicationConfig.totalSeats = totalSeats;
 	}
+	
+	
 	
 
 }

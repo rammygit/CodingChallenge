@@ -1,11 +1,15 @@
 package com.app.model;
 
+import java.io.Serializable;
+
 /**
  * 
  * @author ramkumarsundarajan
  *
  */
-public class Customer {
+public class Customer implements Serializable{
+
+	private static final long serialVersionUID = 1L;
 
 	private int id;
 	
