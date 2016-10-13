@@ -3,6 +3,7 @@ package com.app.factory;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.app.model.AtomicSeatReference;
 import com.app.model.Customer;
 import com.app.model.Seat;
 import com.app.model.SeatHold;
@@ -30,6 +31,21 @@ public class AppObjectFactory {
 		seatHold.setId(seatHoldIdCounter.incrementAndGet());
 		seatHold.setCustomer(createCustomer(email));
 		seatHold.setSeats(seatList);
+		return seatHold;
+		
+	}
+	
+	/**
+	 * 
+	 * @param email
+	 * @param seatList
+	 * @return
+	 */
+	public static SeatHold createAtomicSeatHold(String email,List<AtomicSeatReference> seatList){
+		SeatHold seatHold = new SeatHold();
+		seatHold.setId(seatHoldIdCounter.incrementAndGet());
+		seatHold.setCustomer(createCustomer(email));
+		seatHold.setAtomicSeats(seatList);
 		return seatHold;
 		
 	}

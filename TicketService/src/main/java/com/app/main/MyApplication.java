@@ -27,31 +27,54 @@ public class MyApplication {
 		
 		System.out.println("total available seats -> "+totalAvailableSeats);
 		
+		/**
+		 * hold 2
+		 */
 		SeatHold hold = service.findAndHoldSeats(2, "sample@gmail.com");
 		
+		/**
+		 * reserve 2
+		 */
 		String confirmation = service.reserveSeats(hold.getId(), "sample@gmail.com");
 		
-		SeatHold hold1 = service.findAndHoldSeats(2, "sample@gmail.com");
+		/**
+		 * hold 2
+		 */
+		 service.findAndHoldSeats(2, "sample@gmail.com");
 		
-		
+		/**
+		 * hold 2
+		 */
 		
 		SeatHold hold2 = service.findAndHoldSeats(2, "sample@gmail.com");
 		
-		String confirmation1 = service.reserveSeats(hold2.getId(), "sample@gmail.com");
+		/**
+		 * reserve the above hold 2
+		 */
+		service.reserveSeats(hold2.getId(), "sample@gmail.com");
 		
 		
 		Thread.sleep(ApplicationConfig.holdIntervalTime+2L);
 		
+		/**
+		 * release and get count
+		 */
+		 service.numSeatsAvailable();
+		 
+		 /**
+		  * hold 1
+		  */
+		 service.findAndHoldSeats(1, "sample@gmail.com");
 		
-		int totalAvailableSeats2 = service.numSeatsAvailable();
-		SeatHold hold3 = service.findAndHoldSeats(1, "sample@gmail.com");
+		 /**
+		  * hold 2
+		  */
+		service.findAndHoldSeats(2, "sample@gmail.com");
 		
-		SeatHold hold4 = service.findAndHoldSeats(2, "sample@gmail.com");
-		
-		System.out.println("hold id -> "+hold.getId());
-		System.out.println("hold seat count -> "+hold.getSeats().size());
-		
-		
+		/**
+		 * hold 2
+		 */
+		 service.findAndHoldSeats(2, "sample@gmail.com");
 		
 		System.out.println("confirmation -> "+confirmation);
 		

@@ -8,10 +8,10 @@ import java.util.NavigableSet;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentSkipListSet;
-import java.util.concurrent.atomic.AtomicStampedReference;
 import java.util.stream.Collectors;
 
 import com.app.factory.AppObjectFactory;
+import com.app.model.AtomicSeatReference;
 import com.app.model.Seat;
 import com.app.model.Seat.SeatStatus;
 import com.app.model.SeatHold;
@@ -22,30 +22,32 @@ import com.app.util.ObjectUtil;
  * @author ramkumarsundarajan
  *
  */
-public class DataHolder {
+public class InMemoryDataHolder {
 	
-	
-	private final NavigableSet<Seat> seats = new ConcurrentSkipListSet<Seat>(Seat.getSeatComparator());
+	private final NavigableSet<AtomicSeatReference> seats = new ConcurrentSkipListSet<AtomicSeatReference>();
 	
 	private final Map<Integer,SeatHold> seatHoldMap = new ConcurrentHashMap<Integer,SeatHold>();
 	
-	//private final Random randomKey = new SecureRandom();
+	private static final InMemoryDataHolder dataHolder = new InMemoryDataHolder();
 	
-	private static final DataHolder dataHolder = new DataHolder();
 	
 	/**
-	 * for CAS lock-free implementation.
+	 * initialize the data
 	 */
-	private final AtomicStampedReference<NavigableSet<Seat>> atomicSeats 
-						= new AtomicStampedReference<NavigableSet<Seat>>(new ConcurrentSkipListSet<Seat>(Seat.getSeatComparator()),0);
+	private InMemoryDataHolder(){
+		
+		for(int i=1;i<=ApplicationConfig.getTotalSeats();i++){
+			
+			seats.add(new AtomicSeatReference(new Seat(i, SeatStatus.AVAILABLE)));
+		}
 	
-	
-	
+	}
+
 	/**
 	 * get instance of DataHolder.
 	 * @return
 	 */
-	public static DataHolder getInstance(){
+	public static InMemoryDataHolder getInstance(){
 		
 		return dataHolder;
 	}
@@ -62,7 +64,7 @@ public class DataHolder {
 		releaseSeats();
 		try{
 			//seatReadLock.lock();
-			return Math.toIntExact(atomicSeats.getReference().stream().filter(p->p.getStatus().equals(SeatStatus.AVAILABLE)).count());
+			return Math.toIntExact(seats.stream().filter(p->p.get().getStatus().equals(SeatStatus.AVAILABLE)).count());
 		}finally{
 			//seatReadLock.unlock();
 		}
@@ -82,31 +84,31 @@ public class DataHolder {
 		
 		long timeInMS = Calendar.getInstance().getTimeInMillis();
 		
-		List<Seat> seatList = new ArrayList<>();
+		List<AtomicSeatReference> seatList = new ArrayList<AtomicSeatReference>();
 		
 		try{
 			
-			for(Seat seat : atomicSeats.getReference()
+			for(AtomicSeatReference atomicSeatReference : seats
 					.parallelStream().
-					filter(p->p.getStatus().equals(SeatStatus.AVAILABLE))
+					filter(p->p.get().getStatus().equals(SeatStatus.AVAILABLE))
 					.sorted((f1, f2) -> {
 						//System.out.println(f1.getId()+" -> "+f2.getId());
-						if(Math.abs(Math.subtractExact(f1.getId(), f2.getId())) > 1) return 1;
-						else if(Math.abs(Math.subtractExact(f1.getId(), f2.getId())) == 1) return 0;
+						if(Math.abs(Math.subtractExact(f1.get().getId(), f2.get().getId())) > 1) return 1;
+						else if(Math.abs(Math.subtractExact(f1.get().getId(), f2.get().getId())) == 1) return 0;
 						else return -1;
 						//return Integer.signum(f1.getId() - f2.getId());
 					})
 					.limit(seatCount)
 					.collect(Collectors.toList())){
-				seat.setHoldStartTime(timeInMS);
-				seat.setStatus(SeatStatus.HOLD);
-				seatList.add(seat);
+				atomicSeatReference.get().setHoldStartTime(timeInMS);
+				atomicSeatReference.get().setStatus(SeatStatus.HOLD);
+				seatList.add(atomicSeatReference);
 			}
 		}finally {
 			//seatWriteLock.unlock();
 		}
 		
-		SeatHold seatHold = AppObjectFactory.createSeatHold(email, seatList);
+		SeatHold seatHold = AppObjectFactory.createAtomicSeatHold(email, seatList);
 		/* concurrent hashmap will lock only the write operation/ entry */
 		seatHoldMap.put(seatHold.getId(), seatHold);
 		
@@ -125,7 +127,7 @@ public class DataHolder {
 		
 		if(ObjectUtil.isNotNull(seatHold) && ObjectUtil.validCollection(seatHold.getSeats())){
 			for(Seat seat:seatHold.getSeats()){
-				//resetting the hold start time back to 0.
+				//resetting the hold start time back.
 				seat.setHoldStartTime(0L);
 				seat.setStatus(SeatStatus.RESERVED);
 			}
@@ -147,13 +149,13 @@ public class DataHolder {
 		
 		try{
 			//seatWriteLock.lock();
-			for(Seat seat:atomicSeats.getReference()
+			for(AtomicSeatReference atomicSeatReference:seats
 					.parallelStream()
-					.filter(p->p.getHoldStartTime() >= ApplicationConfig.holdIntervalTime)
+					.filter(p->p.get().getHoldStartTime() >= ApplicationConfig.holdIntervalTime)
 					.collect(Collectors.toList())){
 				
-				seat.setStatus(SeatStatus.AVAILABLE);
-				seat.setHoldStartTime(0L);
+				atomicSeatReference.get().setStatus(SeatStatus.AVAILABLE);
+				atomicSeatReference.get().setHoldStartTime(0L);
 			}
 			
 		}finally {
@@ -165,18 +167,17 @@ public class DataHolder {
 	/**
 	 * initializes the data in here from the application config
 	 */
-	private DataHolder(){
-		for(int i=1;i<=ApplicationConfig.getTotalSeats();i++)
-			atomicSeats.getReference().add(new Seat(i, SeatStatus.AVAILABLE));
-	}
 	
 	
 	public  void printData(){
 		System.out.println("<----------- print -------------- >");
-		for(Seat seat:atomicSeats.getReference())
-			System.out.println("seat -> "+seat.getId() +" status -> "+seat.getStatus().toString() +"holdStartTime -> "+seat.getHoldStartTime());
+		for(AtomicSeatReference atomicSeatReference:seats)
+			System.out.println("seat -> "+atomicSeatReference.get().getId() +" status -> "+atomicSeatReference.get().getStatus().toString() 
+					+"holdStartTime -> "+atomicSeatReference.get().getHoldStartTime());
 	}
 	
 	
+
+
 
 }

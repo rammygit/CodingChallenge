@@ -21,6 +21,18 @@ public class SeatHold implements Serializable{
 	private Customer customer;
 	
 	private List<Seat> seats;
+	
+	private List<AtomicSeatReference> atomicSeats;
+
+	
+	
+	public List<AtomicSeatReference> getAtomicSeats() {
+		return atomicSeats;
+	}
+
+	public void setAtomicSeats(List<AtomicSeatReference> atomicSeats) {
+		this.atomicSeats = atomicSeats;
+	}
 
 	public int getId() {
 		return id;

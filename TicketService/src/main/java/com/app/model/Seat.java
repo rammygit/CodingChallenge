@@ -87,7 +87,12 @@ public class Seat implements Comparable<Seat>{
 	}
 	
 	
-	
+	public int sortBestAvailable(Seat f1,Seat f2){
+		if(Math.abs(Math.subtractExact(f1.getId(), f2.getId())) > 1) return -1;
+		else if(Math.abs(Math.subtractExact(f1.getId(), f2.getId())) == 0) return 0;
+		else if(Math.abs(Math.subtractExact(f1.getId(), f2.getId())) == 1) return 0;
+		else return 0;
+	}
 
 	@Override
 	public int compareTo(Seat o) {
