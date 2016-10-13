@@ -87,19 +87,7 @@ public class Seat implements Comparable<Seat>{
 	}
 	
 	
-	/**
-	 * 
-	 * custom comparator 
-	 * for better seat selection. 
-	 * need to find better algorithm.
-	 * @param s1
-	 * @param s2
-	 * @return
-	 */
-	public static int compareByDiff(Seat s1, Seat s2){
-		
-		return Math.subtractExact(s1.getId(), s2.getId());
-	}
+	
 
 	@Override
 	public int compareTo(Seat o) {

@@ -166,12 +166,13 @@ public class DataHolder {
 	 * initializes the data in here from the application config
 	 */
 	private DataHolder(){
-		for(int i=0;i<ApplicationConfig.getTotalSeats();i++)
+		for(int i=1;i<=ApplicationConfig.getTotalSeats();i++)
 			atomicSeats.getReference().add(new Seat(i, SeatStatus.AVAILABLE));
 	}
 	
 	
 	public  void printData(){
+		System.out.println("<----------- print -------------- >");
 		for(Seat seat:atomicSeats.getReference())
 			System.out.println("seat -> "+seat.getId() +" status -> "+seat.getStatus().toString());
 	}

@@ -15,7 +15,7 @@ import com.app.service.TicketService;
 public class MyApplication {
 
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 
 		ApplicationConfig.setTotalSeats(10);
 		
@@ -27,12 +27,31 @@ public class MyApplication {
 		
 		System.out.println("total available seats -> "+totalAvailableSeats);
 		
-		SeatHold hold = service.findAndHoldSeats(10, "sample@gmail.com");
+		SeatHold hold = service.findAndHoldSeats(2, "sample@gmail.com");
+		
+		String confirmation = service.reserveSeats(hold.getId(), "sample@gmail.com");
+		
+		SeatHold hold1 = service.findAndHoldSeats(2, "sample@gmail.com");
+		
+		
+		
+		SeatHold hold2 = service.findAndHoldSeats(2, "sample@gmail.com");
+		
+		String confirmation1 = service.reserveSeats(hold2.getId(), "sample@gmail.com");
+		
+		
+		Thread.sleep(ApplicationConfig.holdIntervalTime+2L);
+		
+		
+		int totalAvailableSeats2 = service.numSeatsAvailable();
+		SeatHold hold3 = service.findAndHoldSeats(1, "sample@gmail.com");
+		
+		SeatHold hold4 = service.findAndHoldSeats(2, "sample@gmail.com");
 		
 		System.out.println("hold id -> "+hold.getId());
 		System.out.println("hold seat count -> "+hold.getSeats().size());
 		
-		String confirmation = service.reserveSeats(hold.getId(), "sample@gmail.com");
+		
 		
 		System.out.println("confirmation -> "+confirmation);
 		
