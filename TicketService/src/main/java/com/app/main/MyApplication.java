@@ -39,7 +39,7 @@ public class MyApplication {
 			System.out.println("Enter the hold time out interval (in seconds)  -> ");
 
 			long timeoutinMillis = TimeUnit.SECONDS.toMillis(scanner.nextInt());
-
+			
 			ApplicationConfig applicationConfig = new ApplicationConfig(totalSeats,timeoutinMillis);
 			
 			System.out.println("hold time interval -> "+applicationConfig.getHoldIntervalTime());

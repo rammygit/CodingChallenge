@@ -17,6 +17,7 @@ import com.app.model.AtomicSeatReference;
 import com.app.model.Seat;
 import com.app.model.Seat.SeatStatus;
 import com.app.model.SeatHold;
+import com.app.util.DateUtil;
 import com.app.util.ObjectUtil;
 import com.app.util.exception.DBException;
 
@@ -116,7 +117,7 @@ public class InMemoryDataHolder {
 			.collect(Collectors.toList());
 			
 			for(AtomicSeatReference atomicSeatReference : availableSeats){
-				atomicSeatReference.get().setHoldStartTime(Calendar.getInstance().getTimeInMillis());
+				atomicSeatReference.get().setHoldStartTime(DateUtil.getCurrentTimeInMillis());
 				atomicSeatReference.get().setStatus(SeatStatus.HOLD);
 				
 				seatList.add(atomicSeatReference);
@@ -133,6 +134,8 @@ public class InMemoryDataHolder {
 		
 		return seatHold;
 	}
+	
+	
 	
 	
 	
@@ -155,7 +158,7 @@ public class InMemoryDataHolder {
 			if(ObjectUtil.isNotNull(seatHold) && ObjectUtil.validCollection(seatHold.getAtomicSeats())){
 				for(AtomicSeatReference atomicSeatReference:seatHold.getAtomicSeats()){
 					//resetting the hold start time back.
-					atomicSeatReference.get().setHoldStartTime(0L);
+					atomicSeatReference.get().setHoldStartTime(0);
 					atomicSeatReference.get().setStatus(SeatStatus.RESERVED);
 				}
 			} else {
@@ -201,7 +204,7 @@ public class InMemoryDataHolder {
 		//seatWriteLock.lock();
 		for(AtomicSeatReference atomicSeatReference:seats
 				.parallelStream()
-				.filter(p->p.get().getHoldStartTime() >= applicationConfig.getHoldIntervalTime())
+				.filter(p->DateUtil.isHoldTimeExpired(p.get().getHoldStartTime(), applicationConfig.getHoldIntervalTime()))
 				.collect(Collectors.toList())){
 
 			atomicSeatReference.get().setStatus(SeatStatus.AVAILABLE);
