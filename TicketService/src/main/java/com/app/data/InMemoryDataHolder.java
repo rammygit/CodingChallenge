@@ -93,8 +93,6 @@ public class InMemoryDataHolder {
 		
 		SeatHold seatHold = null;
 		
-		long timeInMS = Calendar.getInstance().getTimeInMillis();
-		
 		List<AtomicSeatReference> seatList = new ArrayList<AtomicSeatReference>();
 		
 		int totalAvaialbleSeats = getAvailableSeatCount();
@@ -104,20 +102,23 @@ public class InMemoryDataHolder {
 		
 		try{
 			
-			for(AtomicSeatReference atomicSeatReference : seats
-					.parallelStream().
-					filter(p->p.get().getStatus().equals(SeatStatus.AVAILABLE))
-					.sorted((f1, f2) -> {
-						//System.out.println(f1.getId()+" -> "+f2.getId());
-						if(Math.abs(Math.subtractExact(f1.get().getId(), f2.get().getId())) > 1) return 1;
-						else if(Math.abs(Math.subtractExact(f1.get().getId(), f2.get().getId())) == 1) return 0;
-						else return -1;
-						//return Integer.signum(f1.getId() - f2.getId());
-					})
-					.limit(seatCount)
-					.collect(Collectors.toList())){
-				atomicSeatReference.get().setHoldStartTime(timeInMS);
+			List<AtomicSeatReference> availableSeats = seats
+			.parallelStream().
+			filter(p->p.get().getStatus().equals(SeatStatus.AVAILABLE))
+			.sorted((f1, f2) -> {
+				//System.out.println(f1.getId()+" -> "+f2.getId());
+				if(Math.abs(Math.subtractExact(f1.get().getId(), f2.get().getId())) > 1) return 1;
+				else if(Math.abs(Math.subtractExact(f1.get().getId(), f2.get().getId())) == 1) return 0;
+				else return -1;
+				//return Integer.signum(f1.getId() - f2.getId());
+			})
+			.limit(seatCount)
+			.collect(Collectors.toList());
+			
+			for(AtomicSeatReference atomicSeatReference : availableSeats){
+				atomicSeatReference.get().setHoldStartTime(Calendar.getInstance().getTimeInMillis());
 				atomicSeatReference.get().setStatus(SeatStatus.HOLD);
+				
 				seatList.add(atomicSeatReference);
 				
 				seatHold = addToSeatHoldMap(email, seatList, false);
@@ -125,8 +126,8 @@ public class InMemoryDataHolder {
 
 			}
 		}catch(Exception ex){
-			
-			seatHold = addToSeatHoldMap(email, seatList, false);
+			ex.printStackTrace();
+			seatHold = addToSeatHoldMap(email, seatList, true);
 			throw new DBException("Cannot process the transaction ->"+ObjectUtil.getStackStraceAsString(ex));
 		}
 		
