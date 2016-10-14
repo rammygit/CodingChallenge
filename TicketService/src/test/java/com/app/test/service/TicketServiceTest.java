@@ -32,20 +32,17 @@ public class TicketServiceTest {
 	
 	@BeforeClass
 	public static void initService(){
-		System.out.println("initialize service ..... ");
 		
 		applicationConfig = new ApplicationConfig(totalSeats,holdTimerInterval);
-		
 	}
 	
 	@Before
 	public void beforeTest(){
 		
-		System.out.println("calling before test .... ");
-		
 		ticketService = new TicketService(
 				new TicketServiceManager(
 						new ConsoleExceptionHandler(),applicationConfig));
+		
 	}
 	
 	@After
