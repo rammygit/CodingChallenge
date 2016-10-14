@@ -43,7 +43,7 @@ import com.app.util.exception.DBException;
  */
 public class InMemoryDataHolder {
 	
-	private final static NavigableSet<AtomicSeatReference> seats = new ConcurrentSkipListSet<AtomicSeatReference>();
+	private final NavigableSet<AtomicSeatReference> seats = new ConcurrentSkipListSet<AtomicSeatReference>();
 	
 	private final Map<Integer,SeatHold> seatHoldMap = new ConcurrentHashMap<Integer,SeatHold>();
 	

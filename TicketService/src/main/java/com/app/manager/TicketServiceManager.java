@@ -36,7 +36,7 @@ public class TicketServiceManager implements IServiceManager{
 		} catch (DBException e) {
 			exceptionHandler.handle(e, e.getMessage());
 		}
-		inMemoryDataHolder.printData();
+		//inMemoryDataHolder.printData();
 		return count;
 	}
 

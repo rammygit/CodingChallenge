@@ -18,7 +18,7 @@ public class ConsoleExceptionHandler implements ExceptionHandler{
 		/**
 		 * TODO: change to Logger implementation.
 		 */
-		System.out.println(builder.toString());
+		//System.out.println(builder.toString());
 	}
 
 }

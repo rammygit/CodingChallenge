@@ -2,6 +2,7 @@ package com.app.test.service;
 
 import static org.junit.Assert.*;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -25,7 +26,7 @@ public class TicketServiceTest {
 	
 	private static ApplicationConfig applicationConfig;
 	
-	private final static int totalSeats = 20;
+	private final static int totalSeats = 100;
 	
 	private final static long holdTimerInterval = 10L;
 	
@@ -34,8 +35,6 @@ public class TicketServiceTest {
 		System.out.println("initialize service ..... ");
 		
 		applicationConfig = new ApplicationConfig(totalSeats,holdTimerInterval);
-		
-		
 		
 	}
 	
@@ -49,7 +48,11 @@ public class TicketServiceTest {
 						new ConsoleExceptionHandler(),applicationConfig));
 	}
 	
-	@Ignore
+	@After
+	public void afterTest(){
+		ticketService = null;
+	}
+	
 	@Test
 	public void testTotalSeats(){
 		
@@ -61,7 +64,8 @@ public class TicketServiceTest {
 	
 	@Test
 	public void testHoldSeats(){
-		SeatHold seatHold = ticketService.findAndHoldSeats(totalSeats-10, "r@gmail.com");
+		
+		SeatHold seatHold = ticketService.findAndHoldSeats(applicationConfig.getTotalSeats() -10, "r@gmail.com");
 		assertNotNull(seatHold);
 		assertNotNull(seatHold.getAtomicSeats());
 		assertEquals(totalSeats-10,seatHold.getAtomicSeats().size());
@@ -70,7 +74,7 @@ public class TicketServiceTest {
 	
 	@Test
 	public void testReserveSuccess(){
-		SeatHold seatHold = ticketService.findAndHoldSeats(totalSeats-10, "r@gmail.com");
+		SeatHold seatHold = ticketService.findAndHoldSeats(applicationConfig.getTotalSeats()-10, "r@gmail.com");
 		String confirmationCode = ticketService.reserveSeats(seatHold.getId(), "r@gmail.com");
 		assertNotNull(confirmationCode);
 	}
