@@ -16,12 +16,13 @@ import com.app.util.exception.ExceptionHandler;
  */
 public class TicketServiceManager implements IServiceManager{
 	
-	private final InMemoryDataHolder inMemoryDataHolder = InMemoryDataHolder.getInstance();
+	private InMemoryDataHolder inMemoryDataHolder;
 	
 	private ExceptionHandler exceptionHandler;
 	
-	public TicketServiceManager(ExceptionHandler exceptionHandler) {
+	public TicketServiceManager(ExceptionHandler exceptionHandler,ApplicationConfig applicationConfig) {
 		this.exceptionHandler = exceptionHandler;
+		this.inMemoryDataHolder = new InMemoryDataHolder(applicationConfig);
 	}
 	
 	
@@ -35,17 +36,19 @@ public class TicketServiceManager implements IServiceManager{
 		} catch (DBException e) {
 			exceptionHandler.handle(e, e.getMessage());
 		}
-		//inMemoryDataHolder.printData();
+		inMemoryDataHolder.printData();
 		return count;
 	}
 
 	@Override
 	public SeatHold holdSeats(int seatCount, String email) {
-		
+		//TODO: email validation
 		SeatHold seatHold = null;
 		try {
 			seatHold = inMemoryDataHolder.holdSeat(seatCount, email);
 		} catch (DBException e) {
+			if(seatHold==null)
+				seatHold = AppObjectFactory.createAtomicSeatHold(email, null, true);
 			exceptionHandler.handle(e, e.getMessage());
 		} catch (Exception ex){
 			/**

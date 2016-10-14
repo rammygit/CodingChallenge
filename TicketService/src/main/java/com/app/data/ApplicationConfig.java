@@ -9,23 +9,32 @@ package com.app.data;
  */
 public class ApplicationConfig {
 	
-	private static int totalSeats = 0;
+	private int totalSeats = 0;
 	
-	public static final long holdIntervalTime = 10L;
+	public long holdIntervalTime = 10L;
 	
 	public static final String errorCode = "00000";
 	
+	public static final boolean printLog = false;
 	
 	
-	public static int getTotalSeats(){
-		return totalSeats;
+	public ApplicationConfig(int totalSeats){
+		
+		this.totalSeats = totalSeats;
 	}
 	
-	public static void setTotalSeats(int totalSeats){
-		ApplicationConfig.totalSeats = totalSeats;
+	public ApplicationConfig(int totalSeats,long holdTimeInterval){
+		
+		this.totalSeats = totalSeats;
+		this.holdIntervalTime = holdTimeInterval;
 	}
 	
+	public int getTotalSeats(){
+		return this.totalSeats;
+	}
 	
+	public long getHoldIntervalTime(){
+		return this.holdIntervalTime;
+	}
 	
-
 }

@@ -43,35 +43,30 @@ import com.app.util.exception.DBException;
  */
 public class InMemoryDataHolder {
 	
-	private final NavigableSet<AtomicSeatReference> seats = new ConcurrentSkipListSet<AtomicSeatReference>();
+	private final static NavigableSet<AtomicSeatReference> seats = new ConcurrentSkipListSet<AtomicSeatReference>();
 	
 	private final Map<Integer,SeatHold> seatHoldMap = new ConcurrentHashMap<Integer,SeatHold>();
 	
-	private static final InMemoryDataHolder dataHolder = new InMemoryDataHolder();
-	
 	private final ReadWriteLock readWriteLock = new ReentrantReadWriteLock(false);
+	
+	private ApplicationConfig applicationConfig;
 	
 	
 	/**
 	 * initialize the data
 	 */
-	private InMemoryDataHolder(){
+	public InMemoryDataHolder(ApplicationConfig applicationConfig){
 		
-		for(int i=1;i<=ApplicationConfig.getTotalSeats();i++){
+		this.applicationConfig = applicationConfig;
+		
+		for(int i=1;i<=applicationConfig.getTotalSeats();i++){
 			
 			seats.add(new AtomicSeatReference(new Seat(i, SeatStatus.AVAILABLE)));
 		}
-	
 	}
 
-	/**
-	 * get instance of DataHolder.
-	 * @return
-	 */
-	public static InMemoryDataHolder getInstance(){
-		
-		return dataHolder;
-	}
+	
+	
 	
 	/**
 	 * return the current available seat count
@@ -205,7 +200,7 @@ public class InMemoryDataHolder {
 		//seatWriteLock.lock();
 		for(AtomicSeatReference atomicSeatReference:seats
 				.parallelStream()
-				.filter(p->p.get().getHoldStartTime() >= ApplicationConfig.holdIntervalTime)
+				.filter(p->p.get().getHoldStartTime() >= applicationConfig.getHoldIntervalTime())
 				.collect(Collectors.toList())){
 
 			atomicSeatReference.get().setStatus(SeatStatus.AVAILABLE);

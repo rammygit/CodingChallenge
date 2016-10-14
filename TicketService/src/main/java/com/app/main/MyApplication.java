@@ -23,11 +23,11 @@ public class MyApplication {
 	 */
 	public static void main(String[] args) throws Exception {
 
-		ApplicationConfig.setTotalSeats(10);
+		ApplicationConfig applicationConfig = new ApplicationConfig(10);
 		
 		ITicketService service = new TicketService(
 				new TicketServiceManager(
-						new ConsoleExceptionHandler()));
+						new ConsoleExceptionHandler(),applicationConfig));
 		
 		int totalAvailableSeats = service.numSeatsAvailable();
 		
@@ -60,7 +60,7 @@ public class MyApplication {
 		service.reserveSeats(hold2.getId(), "sample@gmail.com");
 		
 		
-		Thread.sleep(ApplicationConfig.holdIntervalTime+2L);
+		Thread.sleep(applicationConfig.getHoldIntervalTime()+2L);
 		
 		/**
 		 * release and get count
