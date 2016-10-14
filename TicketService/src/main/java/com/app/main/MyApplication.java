@@ -63,7 +63,7 @@ public class MyApplication {
 					
 					// read line from the user input
 					System.out.println(
-							"Please Select an operation " + ""
+							"Starting Application .... Please Select an operation " + ""
 									+ "\nEnter 1 -> find total available seats "
 									+ "\nEnter 2 ->  Find and hold the available seats "
 									+ "\nEnter 3 ->  reserve the seats "
